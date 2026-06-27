@@ -10,45 +10,44 @@ function Readings() {
     const [stats, setStats] = useState({ total: 0, normal: 0, mild: 0, elevated: 0 });
     const [selected, setSelected] = useState(null);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
+        const loadAllReadings = async () => {
+            setLoading(true);
+            try {
+                const users = await getAllUsers();
+                let allReadings = [];
+
+                for (const user of users) {
+                    const history = await getHistory(user.user_id);
+                    const withUser = history.map(r => ({ ...r, user_id: user.user_id }));
+                    allReadings = [...allReadings, ...withUser];
+                }
+
+                allReadings.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                const total = allReadings.length;
+                const normal = allReadings.filter(r => r.risk_level === 'Normal').length;
+                const mild = allReadings.filter(r => r.risk_level === 'Mild Risk').length;
+                const elevated = allReadings.filter(r => r.risk_level === 'Elevated Risk').length;
+                setStats({ total, normal, mild, elevated });
+
+                if (type === 'normal') {
+                    setReadings(allReadings.filter(r => r.risk_level === 'Normal'));
+                } else if (type === 'mild') {
+                    setReadings(allReadings.filter(r => r.risk_level === 'Mild Risk'));
+                } else if (type === 'elevated') {
+                    setReadings(allReadings.filter(r => r.risk_level === 'Elevated Risk'));
+                } else {
+                    setReadings(allReadings);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            setLoading(false);
+        };
+
         loadAllReadings();
     }, [type]);
-    
-    const loadAllReadings = async () => {
-        setLoading(true);
-        try {
-            const users = await getAllUsers();
-            let allReadings = [];
-
-            for (const user of users) {
-                const history = await getHistory(user.user_id);
-                const withUser = history.map(r => ({ ...r, user_id: user.user_id }));
-                allReadings = [...allReadings, ...withUser];
-            }
-
-            allReadings.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            const total = allReadings.length;
-            const normal = allReadings.filter(r => r.risk_level === 'Normal').length;
-            const mild = allReadings.filter(r => r.risk_level === 'Mild Risk').length;
-            const elevated = allReadings.filter(r => r.risk_level === 'Elevated Risk').length;
-            setStats({ total, normal, mild, elevated });
-
-            if (type === 'normal') {
-                setReadings(allReadings.filter(r => r.risk_level === 'Normal'));
-            } else if (type === 'mild') {
-                setReadings(allReadings.filter(r => r.risk_level === 'Mild Risk'));
-            } else if (type === 'elevated') {
-                setReadings(allReadings.filter(r => r.risk_level === 'Elevated Risk'));
-            } else {
-                setReadings(allReadings);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-        setLoading(false);
-    };
 
     const getRiskColor = (risk) => {
         if (risk === 'Normal') return '#10B981';
@@ -157,7 +156,7 @@ function Readings() {
     );
 
     return (
-        <div style={{ padding: '30px', maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ padding: '30px', maxWidth: '1200px', margin: '0 auto', overflow: 'hidden' }}>
 
             {/* Header */}
             <div style={{
@@ -218,16 +217,19 @@ function Readings() {
             <div style={{
                 display: 'flex',
                 gap: '16px',
-                alignItems: 'start'
+                alignItems: 'start',
+                width: '100%',
+                overflow: 'hidden'
             }}>
                 {/* Readings Table */}
                 <div style={{
                     backgroundColor: '#111827',
                     border: "1px solid #1E2A3A",
-                    borderRadius: '12px', padding: '20px',
-                    overflow: 'hidden',
+                    borderRadius: '12px',
+                    padding: '20px',
                     flex: 1,
-                    minWidth: 0
+                    minWidth: 0,
+                    overflow: 'hidden'
                 }}>
                     {readings.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
@@ -236,16 +238,26 @@ function Readings() {
                         </div>
                     ) : (
                         <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '580px' }}>
                                 <thead>
                                     <tr style={{ borderBottom: "1px solid #1E2A3A" }}>
-                                        {['User', 'Heart Rate', 'SpO₂', 'Steps', 'Sleep', 'Risk Level', 'Time'].map((h, i) => (
+                                        {[
+                                            { label: 'User', width: '100px' },
+                                            { label: 'Heart Rate', width: '100px' },
+                                            { label: 'SpO₂', width: '70px' },
+                                            { label: 'Steps', width: '80px' },
+                                            { label: 'Sleep', width: '70px' },
+                                            { label: 'Risk Level', width: '130px' },
+                                            { label: 'Time', width: '140px' }
+                                        ].map((h, i) => (
                                             <th key={i} style={{
                                                 padding: '10px 12px', textAlign: 'left',
                                                 fontSize: '11px', color: '#475569',
                                                 fontWeight: '600', letterSpacing: '0.5px',
-                                                textTransform: 'uppercase', whiteSpace: 'nowrap'
-                                            }}>{h}</th>
+                                                textTransform: 'uppercase',
+                                                whiteSpace: 'nowrap',
+                                                width: h.width
+                                            }}>{h.label}</th>
                                         ))}
                                     </tr>
                                 </thead>
@@ -272,34 +284,57 @@ function Readings() {
                                                         ? 'transparent' : 'rgba(30,42,58,0.3)'
                                             }}
                                         >
-                                            <td style={{ padding: '10px 12px', fontSize: '13px', color: '#06B6D4', fontWeight: '600' }}>
+                                            <td style={{
+                                                padding: '10px 12px', fontSize: '13px',
+                                                color: '#06B6D4', fontWeight: '600',
+                                                whiteSpace: 'nowrap'
+                                            }}>
                                                 {r.user_id}
                                             </td>
-                                            <td style={{ padding: '10px 12px', fontSize: '13px', color: '#F1F5F9' }}>
-                                                {r.heart_rate} BPM
+                                            <td style={{
+                                                padding: '10px 12px', fontSize: '13px',
+                                                color: '#F1F5F9', whiteSpace: 'nowrap'
+                                            }}>
+                                                {Math.round(r.heart_rate)} BPM
                                             </td>
-                                            <td style={{ padding: '10px 12px', fontSize: '13px', color: '#F1F5F9' }}>
-                                                {r.spo2}%
+                                            <td style={{
+                                                padding: '10px 12px', fontSize: '13px',
+                                                color: '#F1F5F9', whiteSpace: 'nowrap'
+                                            }}>
+                                                {Math.round(r.spo2)}%
                                             </td>
-                                            <td style={{ padding: '10px 12px', fontSize: '13px', color: '#F1F5F9' }}>
-                                                {Number(r.steps).toLocaleString()}
+                                            <td style={{
+                                                padding: '10px 12px', fontSize: '13px',
+                                                color: '#F1F5F9', whiteSpace: 'nowrap'
+                                            }}>
+                                                {Number(Math.round(r.steps)).toLocaleString()}
                                             </td>
-                                            <td style={{ padding: '10px 12px', fontSize: '13px', color: '#F1F5F9' }}>
-                                                {r.sleep_hours}h
+                                            <td style={{
+                                                padding: '10px 12px', fontSize: '13px',
+                                                color: '#F1F5F9', whiteSpace: 'nowrap'
+                                            }}>
+                                                {parseFloat(r.sleep_hours).toFixed(1)}h
                                             </td>
-                                            <td style={{ padding: '10px 12px' }}>
+                                            <td style={{
+                                                padding: '10px 12px',
+                                                minWidth: '130px'
+                                            }}>
                                                 <span style={{
                                                     backgroundColor: `${getRiskColor(r.risk_level)}20`,
                                                     color: getRiskColor(r.risk_level),
                                                     padding: '3px 10px', borderRadius: '12px',
                                                     fontSize: '12px', fontWeight: '600',
                                                     border: `1px solid ${getRiskColor(r.risk_level)}40`,
-                                                    whiteSpace: 'nowrap'
+                                                    whiteSpace: 'nowrap',
+                                                    display: 'inline-block'
                                                 }}>
                                                     {r.risk_level}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '10px 12px', fontSize: '11px', color: '#475569', whiteSpace: 'nowrap' }}>
+                                            <td style={{
+                                                padding: '10px 12px', fontSize: '11px',
+                                                color: '#475569', whiteSpace: 'nowrap'
+                                            }}>
                                                 {formatDate(r.timestamp)}
                                             </td>
                                         </tr>
@@ -320,7 +355,7 @@ function Readings() {
                         position: 'sticky', top: '80px',
                         maxHeight: 'calc(100vh - 120px)',
                         overflowY: 'auto',
-                        width: '380px',
+                        width: '360px',
                         flexShrink: 0
                     }}>
                         {/* Panel Header */}
@@ -371,10 +406,10 @@ function Readings() {
                             gap: '8px', marginBottom: '16px'
                         }}>
                             {[
-                                { icon: '❤️', label: 'Heart Rate', value: `${selected.heart_rate} BPM` },
-                                { icon: '🫧', label: 'Blood Oxygen', value: `${selected.spo2}%` },
-                                { icon: '👟', label: 'Steps', value: Number(selected.steps).toLocaleString() },
-                                { icon: '😴', label: 'Sleep', value: `${selected.sleep_hours}h` },
+                                { icon: '❤️', label: 'Heart Rate', value: `${Math.round(selected.heart_rate)} BPM` },
+                                { icon: '🫧', label: 'Blood Oxygen', value: `${Math.round(selected.spo2)}%` },
+                                { icon: '👟', label: 'Steps', value: Number(Math.round(selected.steps)).toLocaleString() },
+                                { icon: '😴', label: 'Sleep', value: `${parseFloat(selected.sleep_hours).toFixed(1)}h` },
                                 { icon: '🏃', label: 'Activity', value: selected.activity_level },
                                 { icon: '📊', label: 'Confidence', value: `${selected.confidence}%` }
                             ].map((m, i) => (
@@ -383,7 +418,10 @@ function Readings() {
                                     padding: '10px', border: "1px solid #1E2A3A"
                                 }}>
                                     <div style={{ fontSize: '14px', marginBottom: '3px' }}>{m.icon}</div>
-                                    <div style={{ fontSize: '14px', fontWeight: '700', color: '#F1F5F9' }}>
+                                    <div style={{
+                                        fontSize: '13px', fontWeight: '700',
+                                        color: '#F1F5F9', wordBreak: 'break-word'
+                                    }}>
                                         {m.value}
                                     </div>
                                     <div style={{ fontSize: '10px', color: '#475569', marginTop: '1px' }}>
@@ -418,7 +456,10 @@ function Readings() {
                                             marginBottom: '5px', alignItems: 'flex-start'
                                         }}>
                                             <span style={{ color: '#3B82F6', fontSize: '12px' }}>•</span>
-                                            <span style={{ color: '#94A3B8', fontSize: '12px', lineHeight: '1.5' }}>
+                                            <span style={{
+                                                color: '#94A3B8', fontSize: '12px',
+                                                lineHeight: '1.5'
+                                            }}>
                                                 {obs}
                                             </span>
                                         </div>
@@ -441,7 +482,10 @@ function Readings() {
                                                     border: "1px solid #1E2A3A"
                                                 }}>
                                                     <span style={{ color: '#10B981', fontSize: '12px' }}>✓</span>
-                                                    <span style={{ color: '#F1F5F9', fontSize: '12px', lineHeight: '1.5' }}>
+                                                    <span style={{
+                                                        color: '#F1F5F9', fontSize: '12px',
+                                                        lineHeight: '1.5'
+                                                    }}>
                                                         {tip}
                                                     </span>
                                                 </div>
