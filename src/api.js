@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://127.0.0.1:8000/api/health';
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api/health';
 
 export const predictRisk = async (data) => {
     const response = await axios.post(`${BASE_URL}/predict`, data);

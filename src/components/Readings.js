@@ -10,10 +10,11 @@ function Readings() {
     const [stats, setStats] = useState({ total: 0, normal: 0, mild: 0, elevated: 0 });
     const [selected, setSelected] = useState(null);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         loadAllReadings();
     }, [type]);
-
+    
     const loadAllReadings = async () => {
         setLoading(true);
         try {
