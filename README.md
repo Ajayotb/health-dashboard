@@ -1,70 +1,128 @@
-# Getting Started with Create React App
+# AI-Powered Wearable Health Monitoring Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web-based dashboard developed as part of an AI-powered wearable health monitoring and predictive system. The application provides a visual interface for presenting physiological measurements and supporting health monitoring through a connected backend API.
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+The dashboard is the frontend component of a smart health monitoring system designed to help users observe their health indicators and understand changes in their physiological data.
 
-### `npm start`
+It communicates with a backend service responsible for processing health data, storing readings, and supporting health risk assessment.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The project demonstrates frontend development, API integration, data visualisation, and the integration of web technologies with an AI-assisted health monitoring application.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+- **Health Data Visualisation:** Presents physiological measurements through a web interface.
+- **API Integration:** Uses HTTP requests to communicate with backend services.
+- **Data-Driven Interface:** Supports the presentation of health monitoring information returned by the backend.
+- **Chart-Based Visualisation:** Uses Recharts for displaying supported data graphically.
+- **Client-Side Navigation:** Uses React Router for application navigation.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+*Note: The availability of individual features depends on the current implementation and the data returned by the backend.*
 
-### `npm run build`
+## Technology Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Technology | Purpose |
+|---|---|
+| React | Building the user interface |
+| JavaScript | Application logic |
+| Axios | HTTP communication with backend services |
+| React Router | Client-side navigation |
+| Recharts | Data visualisation |
+| CSS | Styling and layout |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Project Architecture
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The dashboard communicates with the backend API to retrieve or submit supported health monitoring data.
 
-### `npm run eject`
+```text
+User
+  |
+  v
+React Dashboard
+  |
+  v
+Axios HTTP Requests
+  |
+  v
+FastAPI Backend
+  |
+  v
+Database and Health Assessment Logic
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+The backend repository is available here:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+[Health Backend](https://github.com/Ajayotb/health-backend)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Live Demo
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Explore the deployed dashboard:
 
-## Learn More
+[Open Health Monitoring Dashboard](https://health-dashboard-six-puce.vercel.app/)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Getting Started
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Prerequisites
 
-### Code Splitting
+- Node.js
+- npm
+- Access to the backend API for features that require server communication
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Installation
 
-### Analyzing the Bundle Size
+Clone the repository:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+git clone https://github.com/Ajayotb/health-dashboard.git
+```
 
-### Making a Progressive Web App
+Navigate to the project directory:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+cd health-dashboard
+```
 
-### Advanced Configuration
+Install the dependencies:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+npm install
+```
 
-### Deployment
+### Running Locally
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Start the development server:
 
-### `npm run build` fails to minify
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The application should be available at:
+
+```text
+http://localhost:3000
+```
+
+### Production Build
+
+Create an optimised production build:
+
+```bash
+npm run build
+```
+
+The generated build files can be deployed to a compatible static hosting platform.
+
+## Related Repository
+
+The backend API is maintained separately:
+
+- [health-backend](https://github.com/Ajayotb/health-backend)
+
+## Project Purpose
+
+This project demonstrates the application of software engineering principles to the development of a health monitoring interface, including component-based UI development, API communication, and data visualisation.
+
+## Disclaimer
+
+This application is a software development project and is not intended to replace professional medical advice, diagnosis, or treatment.
